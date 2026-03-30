@@ -1,8 +1,11 @@
 {
-  "name": "vehicules-service",
+  "name": "vehicle-service",
   "version": "1.0.0",
+  "description": "Vehicle service API",
   "main": "app.js",
-  "dependencies": {
-    "express": "^4.18.2"
-  }
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "dependencies": {}
 }
