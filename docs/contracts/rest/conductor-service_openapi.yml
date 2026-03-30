@@ -1,0 +1,202 @@
+openapi: 3.0.0
+info:
+  title: Conductor Service API
+  description: API pour la gestion des conducteurs (CRUD, affectation, historique).
+  version: 1.0.0
+servers:
+  - url: http://localhost:8082
+    description: Environnement de développement
+paths:
+  /drivers:
+    get:
+      tags:
+        - Drivers
+      summary: Liste tous les conducteurs
+      security:
+        - bearerAuth: [admin, manager]
+      parameters:
+        - name: role
+          in: query
+          description: Filtrer par rôle (user, technicien, manager)
+          required: false
+          schema:
+            type: string
+            enum: [user, technicien, manager]
+      responses:
+        '200':
+          description: Liste des conducteurs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Driver'
+    post:
+      tags:
+        - Drivers
+      summary: Crée un nouveau conducteur
+      security:
+        - bearerAuth: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DriverInput'
+      responses:
+        '201':
+          description: Conducteur créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+  /drivers/{id}:
+    get:
+      tags:
+        - Drivers
+      summary: Récupère un conducteur par ID
+      security:
+        - bearerAuth: [admin, manager, technicien]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Conducteur trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+        '404':
+          description: Conducteur non trouvé
+    put:
+      tags:
+        - Drivers
+      summary: Met à jour un conducteur
+      security:
+        - bearerAuth: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DriverInput'
+      responses:
+        '200':
+          description: Conducteur mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+    delete:
+      tags:
+        - Drivers
+      summary: Supprime un conducteur
+      security:
+        - bearerAuth: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Conducteur supprimé
+  /drivers/{id}/vehicles:
+    get:
+      tags:
+        - Drivers
+      summary: Liste les véhicules affectés à un conducteur
+      security:
+        - bearerAuth: [admin, manager, technicien]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des véhicules affectés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+components:
+  schemas:
+    Driver:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        first_name:
+          type: string
+          example: "Jean"
+        last_name:
+          type: string
+          example: "Dupont"
+        license_number:
+          type: string
+          example: "123456789"
+        role:
+          type: string
+          enum: [user, technicien, manager]
+          example: "technicien"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+    DriverInput:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: "Jean"
+        last_name:
+          type: string
+          example: "Dupont"
+        license_number:
+          type: string
+          example: "123456789"
+        role:
+          type: string
+          enum: [user, technicien, manager]
+          example: "technicien"
+      required:
+        - first_name
+        - last_name
+        - license_number
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        license_plate:
+          type: string
+          example: "AB123CD"
+        model:
+          type: string
+          example: "Peugeot 3008"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

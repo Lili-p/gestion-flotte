@@ -1,0 +1,211 @@
+openapi: 3.0.0
+info:
+  title: Vehicle Service API
+  description: API pour la gestion des véhicules (CRUD, recherche, affectation).
+  version: 1.0.0
+servers:
+  - url: http://localhost:8081
+    description: Environnement de développement
+paths:
+  /vehicles:
+    get:
+      tags:
+        - Vehicles
+      summary: Liste tous les véhicules
+      security:
+        - bearerAuth: [admin, manager]
+      parameters:
+        - name: status
+          in: query
+          description: Filtrer par statut (available, in_maintenance, assigned)
+          required: false
+          schema:
+            type: string
+            enum: [available, in_maintenance, assigned]
+      responses:
+        '200':
+          description: Liste des véhicules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+    post:
+      tags:
+        - Vehicles
+      summary: Crée un nouveau véhicule
+      security:
+        - bearerAuth: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleInput'
+      responses:
+        '201':
+          description: Véhicule créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+  /vehicles/{id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Récupère un véhicule par ID
+      security:
+        - bearerAuth: [admin, manager, technicien]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Véhicule trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '404':
+          description: Véhicule non trouvé
+    put:
+      tags:
+        - Vehicles
+      summary: Met à jour un véhicule
+      security:
+        - bearerAuth: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleInput'
+      responses:
+        '200':
+          description: Véhicule mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+    delete:
+      tags:
+        - Vehicles
+      summary: Supprime un véhicule
+      security:
+        - bearerAuth: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Véhicule supprimé
+  /vehicles/{id}/assign:
+    post:
+      tags:
+        - Vehicles
+      summary: Affecte un véhicule à un conducteur
+      security:
+        - bearerAuth: [admin, manager]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                driver_id:
+                  type: integer
+      responses:
+        '200':
+          description: Véhicule affecté avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+components:
+  schemas:
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        license_plate:
+          type: string
+          example: "AB123CD"
+        model:
+          type: string
+          example: "Peugeot 3008"
+        status:
+          type: string
+          enum: [available, in_maintenance, assigned]
+          example: "available"
+        driver_id:
+          type: integer
+          nullable: true
+          example: 1
+        purchase_date:
+          type: string
+          format: date
+          example: "2020-01-15"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+    VehicleInput:
+      type: object
+      properties:
+        license_plate:
+          type: string
+          example: "AB123CD"
+        model:
+          type: string
+          example: "Peugeot 3008"
+        status:
+          type: string
+          enum: [available, in_maintenance, assigned]
+          example: "available"
+        purchase_date:
+          type: string
+          format: date
+          example: "2020-01-15"
+      required:
+        - license_plate
+        - model
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Pour accéder à cette API, un token JWT valide est requis.
+        Obtenez-le via Keycloak :
+        ```
+        POST /realms/GestionFlotteM1/protocol/openid-connect/token
+        Content-Type: application/x-www-form-urlencoded
+
+        grant_type=password&client_id=frontend&username=admin&password=admin123
+        ```

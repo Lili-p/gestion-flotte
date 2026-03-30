@@ -1,0 +1,69 @@
+{
+  "topics": [
+    {
+      "name": "vehicle-events",
+      "description": "Événements liés au cycle de vie des véhicules (création, mise à jour, suppression, affectation).",
+      "example": {
+        "event_type": "vehicle_created",
+        "vehicle_id": 1,
+        "license_plate": "AB123CD",
+        "model": "Peugeot 3008",
+        "status": "available",
+        "driver_id": null,
+        "timestamp": "2026-03-14T12:00:00Z"
+      }
+    },
+    {
+      "name": "driver-events",
+      "description": "Événements liés aux conducteurs (création, mise à jour, affectation à un véhicule).",
+      "example": {
+        "event_type": "driver_created",
+        "driver_id": 1,
+        "first_name": "Jean",
+        "last_name": "Dupont",
+        "license_number": "123456789",
+        "role": "technician",
+        "timestamp": "2026-03-14T12:00:00Z"
+      }
+    },
+    {
+      "name": "maintenance-alerts",
+      "description": "Alertes et événements de maintenance (planification, début, fin, annulation).",
+      "example": {
+        "event_type": "maintenance_scheduled",
+        "maintenance_id": 1,
+        "vehicle_id": 1,
+        "intervention_type": "oil_change",
+        "technician_id": 1,
+        "scheduled_date": "2026-03-15T09:00:00Z",
+        "status": "pending",
+        "timestamp": "2026-03-14T12:00:00Z"
+      }
+    },
+    {
+      "name": "location-updates",
+      "description": "Mises à jour en temps réel de la localisation GPS des véhicules.",
+      "example": {
+        "vehicle_id": 1,
+        "latitude": 48.8566,
+        "longitude": 2.3522,
+        "speed": 60.5,
+        "timestamp": "2026-03-14T12:00:00Z"
+      }
+    },
+    {
+      "name": "system-notifications",
+      "description": "Notifications système pour le frontend (ex: rappels de maintenance, alertes).",
+      "example": {
+        "notification_type": "maintenance_reminder",
+        "title": "Rappel : Maintenance prévue",
+        "message": "La maintenance du véhicule AB123CD est prévue pour le 15/03/2026 à 09:00.",
+        "entity_type": "vehicle",
+        "entity_id": 1,
+        "priority": "medium",
+        "timestamp": "2026-03-14T12:00:00Z",
+        "read": false
+      }
+    }
+  ]
+}

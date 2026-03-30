@@ -1,0 +1,55 @@
+type Maintenance {
+  id: ID!
+  vehicle: Vehicle!
+  interventionType: InterventionType!
+  technician: Driver
+  scheduledDate: String!
+  status: MaintenanceStatus!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Vehicle {
+  id: ID!
+  licensePlate: String!
+}
+
+type Driver {
+  id: ID!
+  firstName: String!
+  lastName: String!
+}
+
+enum InterventionType {
+  OIL_CHANGE
+  TIRE_REPLACEMENT
+  INSPECTION
+  OTHER
+}
+
+enum MaintenanceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+input MaintenanceInput {
+  vehicleId: ID!
+  interventionType: InterventionType!
+  technicianId: ID
+  scheduledDate: String!
+}
+
+type Query {
+  maintenances(status: MaintenanceStatus, vehicleId: ID): [Maintenance!]!
+  maintenance(id: ID!): Maintenance
+}
+
+type Mutation {
+  scheduleMaintenance(input: MaintenanceInput!): Maintenance!
+  updateMaintenance(id: ID!, status: MaintenanceStatus!): Maintenance!
+  cancelMaintenance(id: ID!): Maintenance!
+  startMaintenance(id: ID!): Maintenance!
+  completeMaintenance(id: ID!): Maintenance!
+}

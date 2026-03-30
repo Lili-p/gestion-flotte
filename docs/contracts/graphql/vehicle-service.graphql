@@ -1,0 +1,46 @@
+type Vehicle {
+  id: ID!
+  licensePlate: String!
+  model: String!
+  status: VehicleStatus!
+  driver: Driver
+  purchaseDate: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Driver {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  licenseNumber: String!
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  IN_MAINTENANCE
+  ASSIGNED
+}
+
+input VehicleInput {
+  licensePlate: String!
+  model: String!
+  status: VehicleStatus = AVAILABLE
+  purchaseDate: String!
+}
+
+input AssignDriverInput {
+  driverId: ID!
+}
+
+type Query {
+  vehicles(status: VehicleStatus): [Vehicle!]!
+  vehicle(id: ID!): Vehicle
+}
+
+type Mutation {
+  createVehicle(input: VehicleInput!): Vehicle!
+  updateVehicle(id: ID!, input: VehicleInput!): Vehicle!
+  deleteVehicle(id: ID!): Boolean!
+  assignDriver(id: ID!, input: AssignDriverInput!): Vehicle!
+}

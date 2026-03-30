@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicules
+  namespace: fleet
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vehicules
+  template:
+    metadata:
+      labels:
+        app: vehicules
+    spec:
+      containers:
+      - name: vehicules
+        image: vehicules-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          value: postgres://admin:admin123@postgres-postgresql:5432/fleetdb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicules
+  namespace: fleet
+spec:
+  selector:
+    app: vehicules
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+  type: NodePort

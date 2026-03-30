@@ -1,0 +1,30 @@
+type Location {
+  id: ID!
+  vehicle: Vehicle!
+  latitude: Float!
+  longitude: Float!
+  speed: Float
+  timestamp: String!
+}
+
+type Vehicle {
+  id: ID!
+  licensePlate: String!
+}
+
+input LocationInput {
+  vehicleId: ID!
+  latitude: Float!
+  longitude: Float!
+  speed: Float
+}
+
+type Query {
+  locations(vehicleId: ID, limit: Int = 10): [Location!]!
+  location(id: ID!): Location
+  vehicleHistory(vehicleId: ID!, from: String, to: String): [Location!]!
+}
+
+type Mutation {
+  addLocation(input: LocationInput!): Location!
+}

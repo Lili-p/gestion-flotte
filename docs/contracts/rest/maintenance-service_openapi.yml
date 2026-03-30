@@ -1,0 +1,241 @@
+openapi: 3.0.0
+info:
+  title: Maintenance Service API
+  description: API pour la gestion des maintenances (planification, suivi, historique).
+  version: 1.0.0
+servers:
+  - url: http://localhost:8083
+    description: Environnement de développement
+paths:
+  /maintenance:
+    get:
+      tags:
+        - Maintenance
+      summary: Liste toutes les maintenances
+      security:
+        - bearerAuth: [admin, manager, technicien]
+      parameters:
+        - name: status
+          in: query
+          description: Filtrer par statut (pending, in_progress, completed, cancelled)
+          required: false
+          schema:
+            type: string
+            enum: [pending, in_progress, completed, cancelled]
+        - name: vehicle_id
+          in: query
+          description: Filtrer par ID de véhicule
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des maintenances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Maintenance'
+    post:
+      tags:
+        - Maintenance
+      summary: Planifie une nouvelle maintenance
+      security:
+        - bearerAuth: [admin, manager]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceInput'
+      responses:
+        '201':
+          description: Maintenance planifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Maintenance'
+  /maintenance/{id}:
+    get:
+      tags:
+        - Maintenance
+      summary: Récupère une maintenance par ID
+      security:
+        - bearerAuth: [admin, manager, technicien]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Maintenance trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Maintenance'
+        '404':
+          description: Maintenance non trouvée
+    put:
+      tags:
+        - Maintenance
+      summary: Met à jour une maintenance
+      security:
+        - bearerAuth: [admin, manager]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceUpdate'
+      responses:
+        '200':
+          description: Maintenance mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Maintenance'
+    delete:
+      tags:
+        - Maintenance
+      summary: Annule une maintenance
+      security:
+        - bearerAuth: [admin, manager]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Maintenance annulée
+  /maintenance/{id}/start:
+    post:
+      tags:
+        - Maintenance
+      summary: Démarre une maintenance
+      security:
+        - bearerAuth: [admin, manager, technicien]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Maintenance démarrée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Maintenance'
+  /maintenance/{id}/complete:
+    post:
+      tags:
+        - Maintenance
+      summary: Termine une maintenance
+      security:
+        - bearerAuth: [admin, manager, technicien]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Maintenance terminée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Maintenance'
+components:
+  schemas:
+    Maintenance:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        vehicle_id:
+          type: integer
+          example: 1
+        intervention_type:
+          type: string
+          enum: [oil_change, tire_replacement, inspection, other]
+          example: "oil_change"
+        technician_id:
+          type: integer
+          nullable: true
+          example: 1
+        scheduled_date:
+          type: string
+          format: date-time
+          example: "2026-03-15T00:00:00Z"
+        status:
+          type: string
+          enum: [pending, in_progress, completed, cancelled]
+          example: "pending"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+    MaintenanceInput:
+      type: object
+      properties:
+        vehicle_id:
+          type: integer
+          example: 1
+        intervention_type:
+          type: string
+          enum: [oil_change, tire_replacement, inspection, other]
+          example: "oil_change"
+        technician_id:
+          type: integer
+          nullable: true
+          example: 1
+        scheduled_date:
+          type: string
+          format: date-time
+          example: "2026-03-15T00:00:00Z"
+      required:
+        - vehicle_id
+        - intervention_type
+        - scheduled_date
+    MaintenanceUpdate:
+      type: object
+      properties:
+        intervention_type:
+          type: string
+          enum: [oil_change, tire_replacement, inspection, other]
+          example: "oil_change"
+        technician_id:
+          type: integer
+          nullable: true
+          example: 1
+        scheduled_date:
+          type: string
+          format: date-time
+          example: "2026-03-15T00:00:00Z"
+        status:
+          type: string
+          enum: [pending, in_progress, completed, cancelled]
+          example: "pending"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

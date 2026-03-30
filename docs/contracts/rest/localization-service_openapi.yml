@@ -1,0 +1,177 @@
+openapi: 3.0.0
+info:
+  title: Localization Service API
+  description: API pour la gestion des localisations GPS des véhicules en temps réel.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8084
+    description: Environnement de développement
+paths:
+  /locations:
+    get:
+      tags:
+        - Locations
+      summary: Liste les localisations récentes
+      security:
+        - bearerAuth: [admin, manager]
+      parameters:
+        - name: vehicle_id
+          in: query
+          description: Filtrer par ID de véhicule
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Limite le nombre de résultats
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Liste des localisations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+    post:
+      tags:
+        - Locations
+      summary: Ajoute une nouvelle localisation (utilisé par les dispositifs GPS)
+      security:
+        - apiKeyAuth: []  # Clé API pour les dispositifs IoT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationInput'
+      responses:
+        '201':
+          description: Localisation enregistrée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+  /locations/{id}:
+    get:
+      tags:
+        - Locations
+      summary: Récupère une localisation par ID
+      security:
+        - bearerAuth: [admin, manager]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Localisation trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '404':
+          description: Localisation non trouvée
+  /locations/vehicle/{vehicle_id}:
+    get:
+      tags:
+        - Locations
+      summary: Récupère l’historique des localisations d’un véhicule
+      security:
+        - bearerAuth: [admin, manager]
+      parameters:
+        - name: vehicle_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: from
+          in: query
+          description: Date de début (format ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          description: Date de fin (format ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Historique des localisations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+components:
+  schemas:
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        vehicle_id:
+          type: integer
+          example: 1
+        latitude:
+          type: number
+          format: double
+          example: 48.8566
+        longitude:
+          type: number
+          format: double
+          example: 2.3522
+        speed:
+          type: number
+          format: double
+          nullable: true
+          example: 60.5
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+    LocationInput:
+      type: object
+      properties:
+        vehicle_id:
+          type: integer
+          example: 1
+        latitude:
+          type: number
+          format: double
+          example: 48.8566
+        longitude:
+          type: number
+          format: double
+          example: 2.3522
+        speed:
+          type: number
+          format: double
+          nullable: true
+          example: 60.5
+      required:
+        - vehicle_id
+        - latitude
+        - longitude
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+      description: Clé API pour les dispositifs IoT (non-JWT).

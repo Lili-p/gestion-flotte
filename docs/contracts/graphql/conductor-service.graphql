@@ -1,0 +1,40 @@
+type Driver {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  licenseNumber: String!
+  role: DriverRole!
+  vehicles: [Vehicle!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Vehicle {
+  id: ID!
+  licensePlate: String!
+  model: String!
+}
+
+enum DriverRole {
+  USER
+  TECHNICIAN
+  MANAGER
+}
+
+input DriverInput {
+  firstName: String!
+  lastName: String!
+  licenseNumber: String!
+  role: DriverRole = USER
+}
+
+type Query {
+  drivers(role: DriverRole): [Driver!]!
+  driver(id: ID!): Driver
+}
+
+type Mutation {
+  createDriver(input: DriverInput!): Driver!
+  updateDriver(id: ID!, input: DriverInput!): Driver!
+  deleteDriver(id: ID!): Boolean!
+}
