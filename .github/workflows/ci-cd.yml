@@ -1,18 +1,26 @@
-deploy:
-  needs: docker
-  runs-on: ubuntu-latest
+name: Fleet CI/CD Pipeline
 
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+on:
+  push:
+    branches: ["main"]
 
-    - name: Setup kubeconfig
-      run: |
-        echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
-        export KUBECONFIG=kubeconfig.yaml
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "build-test"
 
-    - name: Verify files
-      run: ls -R
+  docker:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "docker build"
 
-    - name: Deploy to Kubernetes
-      run: kubectl apply -f ./k8s/
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "deploy k8s"
