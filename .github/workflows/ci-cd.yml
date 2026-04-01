@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # On force l'utilisation de Node 22 pour l'environnement d'exécution
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - run: echo "build-test"
 
   docker:
@@ -16,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - run: echo "docker build"
 
   deploy:
@@ -23,4 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - run: echo "deploy k8s"
