@@ -1,0 +1,14 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: broker-pool
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: fleet-cluster
+spec:
+  replicas: 3
+  roles:
+    - broker
+    - controller
+  storage:
+    type: ephemeral
